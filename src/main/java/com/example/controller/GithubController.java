@@ -1,7 +1,6 @@
 package com.example.controller;
 
-import com.example.dto.error.ErrorResponseDto;
-import com.example.model.UserRepository;
+import com.example.dto.UserRepositoryDto;
 import com.example.service.GithubService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +18,8 @@ public class GithubController {
   }
 
   @GetMapping("/{username}/repositories")
-  public ResponseEntity<List<UserRepository>> getRepositories(@PathVariable String username) {
-    List<UserRepository> repositories = githubService.getUserRepositories(username);
+  public ResponseEntity<List<UserRepositoryDto>> getRepositories(@PathVariable String username) {
+    List<UserRepositoryDto> repositories = githubService.getUserRepositories(username);
     return ResponseEntity.ok(repositories);
   }
 }

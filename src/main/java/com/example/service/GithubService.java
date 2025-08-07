@@ -1,9 +1,9 @@
 package com.example.service;
 
-import com.example.model.UserRepository;
+import com.example.dto.UserRepositoryDto;
 import java.util.List;
 
 public interface GithubService {
 
-  List<UserRepository> getUserRepositories(String username);
+  List<UserRepositoryDto> getUserRepositories(String username);
 }

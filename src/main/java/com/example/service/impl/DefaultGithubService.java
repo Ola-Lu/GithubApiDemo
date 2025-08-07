@@ -1,10 +1,10 @@
 package com.example.service.impl;
 
-import com.example.dto.GithubBranchDto;
-import com.example.dto.GithubRepoDto;
+import com.example.dto.github.GithubBranchDto;
+import com.example.dto.github.GithubRepoDto;
 import com.example.exception.UserNotFoundException;
-import com.example.model.RepositoryBranch;
-import com.example.model.UserRepository;
+import com.example.dto.RepositoryBranchDto;
+import com.example.dto.UserRepositoryDto;
 import com.example.service.GithubService;
 import java.util.Optional;
 import org.springframework.core.ParameterizedTypeReference;
@@ -20,7 +20,7 @@ public class DefaultGithubService implements GithubService {
 
   private final RestClient restClient = RestClient.create();
 
-  public List<UserRepository> getUserRepositories(String username) {
+  public List<UserRepositoryDto> getUserRepositories(String username) {
     try {
       var repos = restClient.get()
           .uri("https://api.github.com/users/{username}/repos", username)
@@ -29,14 +29,14 @@ public class DefaultGithubService implements GithubService {
 
       return Optional.ofNullable(repos).orElse(List.of()).stream()
           .filter(repo -> !repo.fork())
-          .map(repo -> new UserRepository(repo.name(), repo.owner().login(), fetchBranches(repo.branches_url())))
+          .map(repo -> new UserRepositoryDto(repo.name(), repo.owner().login(), fetchBranches(repo.branches_url())))
           .collect(Collectors.toList());
     } catch (HttpClientErrorException.NotFound ex) {
       throw new UserNotFoundException("User not found");
     }
   }
 
-  private List<RepositoryBranch> fetchBranches(String branchesUrl) {
+  private List<RepositoryBranchDto> fetchBranches(String branchesUrl) {
     try {
       var url = branchesUrl.replace("{/branch}", "");
       var branches = restClient.get()
@@ -44,7 +44,7 @@ public class DefaultGithubService implements GithubService {
           .retrieve()
           .body(new ParameterizedTypeReference<List<GithubBranchDto>>() {});
       return Optional.ofNullable(branches).orElse(List.of()).stream()
-          .map(branch -> new RepositoryBranch(branch.name(), branch.commit().sha()))
+          .map(branch -> new RepositoryBranchDto(branch.name(), branch.commit().sha()))
           .collect(Collectors.toList());
     } catch (HttpClientErrorException ex) {
       return List.of();

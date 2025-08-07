@@ -1,16 +1,14 @@
 package com.example.controller;
 
-import com.example.model.UserRepository;
+import com.example.dto.UserRepositoryDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
+import org.springframework.web.client.RestClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,16 +19,13 @@ class GithubControllerIT {
   int port;
 
   @Test
-  public void shouldReturnRepositoriesForExistingUser() {
-    RestTemplate restTemplate = new RestTemplate();
+  void shouldReturnRepositoriesForExistingUser() {
+    RestClient restClient = RestClient.builder().build();
     String url = "http://localhost:" + port + "/users/octocat/repositories";
-    ResponseEntity<List<UserRepository>> response = restTemplate.exchange(
-        url,
-        HttpMethod.GET,
-        null,
-        new ParameterizedTypeReference<List<UserRepository>>() {
-        }
-    );
+    var response = restClient.get()
+        .uri(url)
+        .retrieve()
+        .toEntity(new ParameterizedTypeReference<List<UserRepositoryDto>>(){});
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).isNotNull();

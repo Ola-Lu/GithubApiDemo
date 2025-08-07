@@ -1,4 +1,4 @@
-package com.example.dto;
+package com.example.dto.github;
 
 public record GithubBranchDto(String name, Commit commit) {
 
